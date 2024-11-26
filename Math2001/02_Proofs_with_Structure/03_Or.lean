@@ -6,38 +6,36 @@ math2001_init
 
 
 example {x y : ℝ} (h : x = 1 ∨ y = -1) : x * y + x = y + 1 := by
-	match h with
-	| Or.inl hx =>
-  	calc
+  match h with
+  | Or.inl hx =>
+    calc
     x * y + x = 1 * y + 1 := by rw [hx]
     _ = y + 1 := by ring
-	| Or.inr hy =>
-  	calc
+  | Or.inr hy =>
+    calc
     x * y + x = x * -1 + x := by rw [hy]
     _ = -1 + 1 := by ring
     _ = y + 1 := by rw [hy]
 
 example {n : ℕ} : n ^ 2 ≠ 2 := by
-  have hn := le_or_succ_le n 1
-  --obtain hp | hn := hn
-	match hn with
-	| Or.inl hp =>
-  	apply ne_of_lt
+  match (le_or_succ_le n 1) with
+  | Or.inl hp =>
+    apply ne_of_lt
     calc
       n^2 ≤ 1^2 := by rel[hp]
       _ < 2 := by numbers
-	| Or.inr hn =>
-  	apply ne_of_gt
+  | Or.inr hn =>
+    apply ne_of_gt
     calc
       n^2 >= 2^2 := by rel[hn]
       _ > 2 := by numbers
 
 example {x : ℝ} (hx : 2 * x + 1 = 5) : x = 1 ∨ x = 2 := by
   right
-	calc
-		x = (2 * x + 1 - 1) / 2 := by ring
-		_ = (5 - 1) / 2 := by rw [hx]
-		_ = 2 := by numbers
+  calc
+    x = (2 * x + 1 - 1) / 2 := by ring
+    _ = (5 - 1) / 2 := by rw [hx]
+    _ = 2 := by numbers
 
 
 example {x : ℝ} (hx : x ^ 2 - 3 * x + 2 = 0) : x = 1 ∨ x = 2 := by
@@ -45,16 +43,15 @@ example {x : ℝ} (hx : x ^ 2 - 3 * x + 2 = 0) : x = 1 ∨ x = 2 := by
     calc
     (x - 1) * (x - 2) = x ^ 2 - 3 * x + 2 := by ring
     _ = 0 := by rw [hx]
-  have h2 := eq_zero_or_eq_zero_of_mul_eq_zero h1
-	match h2 with
-	| Or.inl hm1 =>
-  	left
+  match (eq_zero_or_eq_zero_of_mul_eq_zero h1) with
+  | Or.inl hm1 =>
+    left
     calc
       x = x - 1 + 1 := by ring
       _ = 0 + 1 := by rw[hm1]
       _ = 1 := by ring
-	| Or.inr hm2 =>
-  	right
+  | Or.inr hm2 =>
+    right
     calc
       x = x - 2 + 2 := by ring
       _ = 0 + 2 := by rw[hm2]

@@ -102,14 +102,96 @@ example (x : ℚ) : ∃ y : ℚ, y ^ 2 > x := by
     _ > x := by extra
 
 example {t : ℝ} (h : ∃ a : ℝ, a * t + 1 < a + t) : t ≠ 1 := by
-  sorry
+  obtain ⟨a, ha⟩ := h
+
+  have h1: a * t - t < a - 1 := by addarith[ha]
+  have h2 :=
+  calc
+    (a - 1) * (t - 1) = (a*t - t) - (a-1) := by ring
+    _ < (a-1) - (a-1) := by rel[h1]
+    _ = 0 := by ring
+
+  by_contra ht
+
+  have hbot :=
+  calc
+    0 > (a - 1) * (t - 1) := by addarith[h2]
+    _ = (a - 1) * (1 - 1) := by rw[ht]
+    _ = 0 := by ring
+
+  exact lt_irrefl 0 hbot
+
 
 example {m : ℤ} (h : ∃ a, 2 * a = m) : m ≠ 5 := by
-  sorry
+  obtain ⟨a, ha⟩ := h
+  match (le_or_succ_le a 2) with
+  | Or.inl hale2 =>
+    apply ne_of_lt
+    calc
+      m = 2 * a := by addarith[ha]
+      _ <= 2 * 2 := by rel[hale2]
+      _ < 5 := by numbers 
+  | Or.inr h3lea =>
+    apply ne_of_gt
+    calc
+      m = 2 * a := by addarith[ha]
+      _ >= 2 * 3 := by rel[h3lea]
+      _ > 5 := by numbers
 
 example {n : ℤ} : ∃ a, 2 * a ^ 3 ≥ n * a + 7 := by
-  sorry
+  match (le_or_succ_le n 0) with
+  | Or.inl hnle0 =>
+    use 2
+    calc
+      2 * (2^3) = 9 + 0*2 + 7 := by ring
+      _ >= 9 + n*2 + 7 := by rel[hnle0]
+      _ >= n * 2 + 7 := by norm_num
+  | Or.inr h1len =>
+    use n*2
+    calc
+      2 * (n * 2)^3 = 2*n^2*n + 2*n^3 * 7 := by ring
+      _ >= 2*n^2*1 + 2*1^3 *7 := by rel[h1len]
+      _ = 2*n^2 + 14 := by ring
+      _ >= 2*n^2 + 7 := by norm_num
+      _ = n * (n*2) + 7 := by ring
 
 example {a b c : ℝ} (ha : a ≤ b + c) (hb : b ≤ a + c) (hc : c ≤ a + b) :
     ∃ x y z, x ≥ 0 ∧ y ≥ 0 ∧ z ≥ 0 ∧ a = y + z ∧ b = x + z ∧ c = x + y := by
-  sorry
+  let x := (b + c - a) / 2
+  let y := (a + c - b) / 2
+  let z := (a + b - c) / 2
+  use x, y, z
+  -- Prove non-negativity
+  have hz : z ≥ 0 := by
+    calc
+      z = (a + b - c) / 2 := rfl
+      _ ≥ 0 := by
+        have := add_le_add ha hc
+        addarith[hc]
+  have hy : y ≥ 0 := by
+    calc
+      y = (a + c - b) / 2 := rfl
+      _ ≥ 0 := by
+        have := add_le_add ha hb
+        addarith[hb]
+  have hx : x ≥ 0 := by
+    calc
+      x = (b + c - a) / 2 := rfl
+      _ ≥ 0 := by
+        have := add_le_add hb hc
+        addarith[ha]
+  -- Prove the equations
+  have hc_eq : c = x + y := by
+    calc
+      c = (b + c - a) / 2 + (a + c - b) / 2 := by ring
+      _ = x + y := by rfl
+  have hb_eq : b = x + z := by
+    calc
+      b = (b + c - a) / 2 + (a + b - c) / 2 := by ring
+      _ = x + z := by rfl
+  have ha_eq : a = y + z := by
+    calc
+      a = (a + c - b) / 2 + (a + b - c) / 2 := by ring
+      _ = y + z := by rfl
+  -- Combine results
+  exact ⟨hx, hy, hz, ha_eq, hb_eq, hc_eq⟩

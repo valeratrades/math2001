@@ -113,8 +113,8 @@ example {x y : ℚ} (h : x + y = 5 ∧ x + 2 * y = 7) : x = 3 ∧ y = 2 := by
     _ = 3 := by ring
 
   constructor
-  exact hx
-  calc
+  . exact hx
+  . calc
     y = x + y - x := by ring
     _ = 5 - 3 := by rw[hxpy, hx]
     _ = 2 := by ring

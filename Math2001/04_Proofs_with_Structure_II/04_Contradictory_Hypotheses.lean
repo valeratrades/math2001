@@ -2,6 +2,7 @@
 import Mathlib.Data.Real.Basic
 import Library.Basic
 import Library.Tactic.ModEq
+import Library.Theory.ParityModular
 
 math2001_init
 
@@ -192,21 +193,96 @@ example {x y : ℝ} (n : ℕ) (hx : 0 ≤ x) (hn : 0 < n) (h : y ^ n ≤ x ^ n) 
   | Or.inr h =>
     addarith[h]
 
+
+
 example (n : ℤ) (hn : n ^ 2 ≡ 4 [ZMOD 5]) : n ≡ 2 [ZMOD 5] ∨ n ≡ 3 [ZMOD 5] := by
-  sorry
+  mod_cases h: n % 5
+  . have:=
+    calc
+      4 ≡ n^2 [ZMOD 5] := by rel[hn]
+      _ = n*n := by ring
+      _ ≡ n * n [ZMOD 5] := by extra
+      _ ≡ 0 * 0 [ZMOD 5] := by rel[h]
+      _ = 0 := by ring
+    numbers at this
+  .
+    have:=
+    calc
+      4 ≡ n^2 [ZMOD 5] := by rel[hn]
+      _ = n*n := by ring
+      _ ≡ n * n [ZMOD 5] := by extra
+      _ ≡ 1 * 1 [ZMOD 5] := by rel[h]
+      _ = 1 := by ring
+    numbers at this
+  . left; exact h
+  . right; exact h
+  . have:=
+    calc
+      4 ≡ n^2 [ZMOD 5] := by rel[hn]
+      _ = n*n := by ring
+      _ ≡ n * n [ZMOD 5] := by extra
+      _ ≡ 4 * 4 [ZMOD 5] := by rel[h]
+      _ ≡ 1 + 5*3 [ZMOD 5] := by numbers
+      _ ≡ 1 [ZMOD 5] := by extra
+      _ = 1 := by ring
+    numbers at this
 
-example : Prime 7 := by
-  sorry
+example : Prime 7 := by {
+  apply prime_test
+  · numbers
+  intro m hm_left hm_right
+  apply Nat.not_dvd_of_exists_lt_and_lt
+  interval_cases m
+  · use 3
+    constructor <;> numbers
+  · use 2
+    constructor <;> numbers
+  · use 1
+    constructor <;> numbers
+  · use 1
+    constructor <;> numbers
+  · use 1
+    constructor <;> numbers
+}
 
-example {x : ℚ} (h1 : x ^ 2 = 4) (h2 : 1 < x) : x = 2 := by
+example {x : ℚ} (h1 : x^2 = 4) (h2 : 1 < x) : x = 2 := by
   have h3 :=
     calc
       (x + 2) * (x - 2) = x ^ 2 + 2 * x - 2 * x - 4 := by ring
       _ = 0 := by addarith [h1]
   rw [mul_eq_zero] at h3
-  sorry
+  match h3 with
+  | Or.inl hp2 =>
+    have:=
+    calc
+      -2 = x := by addarith[hp2]
+      _ > 1 := by rel[h2]
+    numbers at this
+  | Or.inr hm2 =>
+    addarith[hm2]
 
 namespace Nat
 
 example (p : ℕ) (h : Prime p) : p = 2 ∨ Odd p := by
-  sorry
+  obtain ⟨h2, hp⟩ := h
+  match (le_or_gt p 2) with
+  | Or.inl hle2 =>
+    left
+    exact Nat.le_antisymm hle2 h2
+  | Or.inr hgt2 =>
+    cases Nat.mod_two_eq_zero_or_one p with --HACK: would be nicer to use something generic like mad_cases, but fuck it
+    | inl hmod_zero =>
+      left
+      have hm0: p ≡ 0 [ZMOD 2] := by sorry -- should just have this with mod_cases
+      -- ∃ k, p = 2*k
+      -- 2 | p
+      -- 2 = p
+      -- _ > 2
+      -- numbers at this
+      sorry
+    | inr hmod_one =>
+      right
+      have hm1: p ≡ 1 [ZMOD 2] := by sorry -- should just have this with mod_cases
+      -- say it's p = 2*k + 1 := by addarith[hm1]
+      -- that's exact def of Odd
+      sorry

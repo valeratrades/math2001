@@ -43,17 +43,29 @@ theorem superpowered_one : Superpowered 1 := by
 #eval 3 ^ 3 ^ 1 + 1 -- 28
 #eval 3 ^ 3 ^ 2 + 1 -- 19684
 
+theorem not_superpowered_two: ¬ Superpowered 2 := by
+  intro h
+  have hfalse: Prime (2 ^ 2 ^ 5 + 1) := h 5
+  conv at hfalse => numbers
+  have not_prime: ¬ Prime 4294967297 := by {
+    apply not_prime 641 6700417
+    . numbers
+    . numbers
+    . numbers
+  }
+  contradiction
 
 theorem not_superpowered_three : ¬ Superpowered 3 := by
   intro h
   dsimp [Superpowered] at h
   have four_prime : Prime (3 ^ 3 ^ 0 + 1) := h 0
   conv at four_prime => numbers -- simplifies that statement to `Prime 4`
-  have four_not_prime : ¬ Prime 4
-  · apply not_prime 2 2
+  have four_not_prime : ¬ Prime 4 := by {
+    apply not_prime 2 2
     · numbers -- show `2 ≠ 1`
     · numbers -- show `2 ≠ 4`
     · numbers -- show `4 = 2 * 2`
+  }
   contradiction
 
 
@@ -79,11 +91,52 @@ example {P : Prop} (hP : ¬¬P) : P := by
 
 def Tribalanced (x : ℝ) : Prop := ∀ n : ℕ, (1 + x / n) ^ n < 3
 
-example : ∃ x : ℝ, Tribalanced x ∧ ¬ Tribalanced (x + 1) := by
+-- trying to prove random stuff at this point
+
+theorem not_tribalanced_3: ¬ Tribalanced 2 := by
+  intro H
+  dsimp[Tribalanced] at *
+  have h1:= H 1
+  have:=
+  calc
+    3 > (1 + 2.0 / 1)^2 := by rel[h1]
+    _ = 9 := by ring
   sorry
+
+--theorem tribalanced_0: Tribalanced 0.0 := by
+--  intro n
+--  cases n with
+--  | zero =>
+--    sorry
+--  | succ k =>
+--    sorry
+
+
+example : ∃ x : ℝ, Tribalanced x ∧ ¬ Tribalanced (x + 1) := by
+  -- succ = (1 + x/n)^n < 3
+  -- 
+  by_cases h05: Tribalanced 0.5
+  . sorry
+  . sorry
+
+
 
 example (P Q : Prop) : (¬P → ¬Q) ↔ (Q → P) := by
-  sorry
+  constructor
+  . intro H
+    intro hq
+    by_cases hp: P
+    . exact hp
+    . have hnq:= H hp
+      contradiction
+  . intro hqtp
+    intro hnp
+    intro hnq
+    have hp:= hqtp hnq
+    contradiction
 
 example : ∃ k : ℕ, Superpowered k ∧ ¬ Superpowered (k + 1) := by
-  sorry
+  use 1
+  constructor
+  . apply superpowered_one
+  . apply not_superpowered_two

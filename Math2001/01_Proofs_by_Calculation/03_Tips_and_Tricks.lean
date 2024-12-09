@@ -189,6 +189,21 @@ example {x y : ℝ} (h1 : x + 3 = 5) (h2 : 2 * x - y * x = 0) : y = 2 :=
     _ = 2 := by ring
 
 
+-- refactored, for an example
+example {x y : ℝ} (h1 : x + 3 = 5) (h2 : 2 * x - y * x = 0) : y = 2 :=
+  have h2y: -2*y = -4 := by {
+    calc
+      -2*y = (2 * x - y * x) - (2 * (x + 3) - y * (x + 3) + 2*y - 6) - 3*y := by ring
+      _ = 0 - (2 * 5 - y * 5 + 2*y - 6) - 3*y := by rw[h1, h2]
+      _ = -4 := by ring
+  }
+  --cancel -2 at h2y
+
+  calc
+    y = (-2*y) / -2 := by ring
+    _ = (-4) / -2 := by rw[h2y]
+    _ = 2 := by ring
+
 example {p q r : ℚ} (h1 : p + q + r = 0) (h2 : p * q + p * r + q * r = 2) :
     p ^ 2 + q ^ 2 + r ^ 2 = -4 :=
   calc

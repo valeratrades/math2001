@@ -91,33 +91,33 @@ example {P : Prop} (hP : ¬¬P) : P := by
 
 def Tribalanced (x : ℝ) : Prop := ∀ n : ℕ, (1 + x / n) ^ n < 3
 
--- trying to prove random stuff at this point
-
-theorem not_tribalanced_3: ¬ Tribalanced 2 := by
+theorem not_tribalanced_two: ¬ Tribalanced 2 := by
   intro H
   dsimp[Tribalanced] at *
   have h1:= H 1
-  have:=
+  have: 3 > (3 : ℝ) → False := fun a ↦ LT.lt.false a
+  apply this 
   calc
-    3 > (1 + 2.0 / 1)^2 := by rel[h1]
-    _ = 9 := by ring
-  sorry
+    3 > (1 + 2 / 1)^1 := by simpa using h1
+    _ = (3 : ℝ) := by ring
 
---theorem tribalanced_0: Tribalanced 0.0 := by
---  intro n
---  cases n with
---  | zero =>
---    sorry
---  | succ k =>
---    sorry
-
+theorem tribilanced_zero: Tribalanced 0 := by
+  intro H
+  conv => ring
+  numbers
 
 example : ∃ x : ℝ, Tribalanced x ∧ ¬ Tribalanced (x + 1) := by
-  -- succ = (1 + x/n)^n < 3
-  -- 
-  by_cases h05: Tribalanced 0.5
-  . sorry
-  . sorry
+  by_cases h1: Tribalanced 1
+  . use 1
+    constructor
+    . apply h1
+    . conv => ring
+      apply not_tribalanced_two
+  . use 0
+    constructor
+    . apply tribilanced_zero
+    . conv => ring
+      apply h1
 
 
 

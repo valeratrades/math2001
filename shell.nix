@@ -9,7 +9,7 @@ in
 }:
 pkgs.mkShellNoCC {
   nativeBuildInputs = [ myPkg ];
-  #shellHook = ''
-  #  elan run 4.3.0 lake exe cache get && elan run 4.3.0 lake build Library && elan run 4.3.0 lake build AutograderLib
-  #''; # not sure, but it might be the thing that's spawning all those lean instancesy
+  shellHook = ''
+    elan override set 4.4.0 && elan run 4.4.0 lake exe cache get && elan run 4.4.0 lake build Library && elan run 4.4.0 lake build AutograderLib
+  ''; # not sure, but it might be the thing that's spawning all those lean instancesy
 }

@@ -326,9 +326,35 @@ theorem uniqueness (a b : ℤ) (h : 0 < b) {r s : ℤ}
     : r = s := by
   obtain ⟨hr0, hrltb, ⟨qr, hqr⟩⟩ := hr
   obtain ⟨hs0, hsltb, ⟨qs, hqs⟩⟩ := hs
-  -- basically prove that `mod` is unique
-  -- can I prove taht `r` must be `mod(a, b)`?
-  sorry
+  have hrd:= fdiv_is_q a b r qr ⟨hr0, hrltb, hqr⟩
+  have hsd:= fdiv_is_q a b s qs ⟨hs0, hsltb, hqs⟩
+  calc r
+    _ = -1 * (a - r) + a := by ring
+    _ = -1 * (b * qr) + a := by rw[hqr]
+    _ = -1 * (b * (fdiv a b)) + a := by rw[hrd]
+    _ = -1 * (b * qs) + a := by rw[hsd]
+    _ = -1 * (a - s) + a := by rw[hqs]
+    _ = s := by ring
 
 example (a b : ℤ) (h : 0 < b) : ∃! r : ℤ, 0 ≤ r ∧ r < b ∧ a ≡ r [ZMOD b] := by
-  sorry
+  use fmod a b
+  constructor
+  .
+    apply And.intro
+    . exact fmod_nonneg_of_pos a h
+    . constructor
+      . exact fmod_lt_of_pos a h
+      . dsimp[Int.ModEq] at *
+        dsimp[(· ∣ · )]
+        use fdiv a b
+        addarith[fmod_add_fdiv a b]
+  . 
+    intro m ⟨hm0, hmltb, ⟨qm, hqm⟩⟩
+    have hmd:=fdiv_is_q a b m qm ⟨hm0, hmltb, hqm⟩
+    have ha:= fmod_add_fdiv a b
+    have:= calc fmod a b
+      _ = fmod a b + (b * fdiv a b) - (b * fdiv a b) := by ring
+      _ = fmod a b + (b * fdiv a b) - (b * qm) := by rw[hmd]
+      _ = a - (a - m) := by rw[ha, hqm]
+      _ = m := by ring
+    addarith[this]

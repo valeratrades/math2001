@@ -164,13 +164,18 @@ example : ¬ ∀ f : ℕ → ℕ, Injective f → Bijective f := by
 
 
 example : Bijective (fun (x : ℝ) ↦ 4 - 3 * x) := by
-  sorry
-
-example : ¬ Bijective (fun (x : ℝ) ↦ 4 - 3 * x) := by
-  sorry
-
+  constructor
+  . intro x y h
+    dsimp at h
+    norm_num at h
+    exact h
+  . intro y
+    use (4 - y) / 3
+    dsimp
+    ring
 
 example : Bijective (fun (x : ℝ) ↦ x ^ 2 + 2 * x) := by
+  --(x + 1)^2 - 1
   sorry
 
 example : ¬ Bijective (fun (x : ℝ) ↦ x ^ 2 + 2 * x) := by

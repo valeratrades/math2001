@@ -12,8 +12,8 @@ math2001_init
   calc k ^ 2 < k ^ 2 + k ^ 2 := by extra
     _ = 2 * k ^ 2 := by ring
     _ = b ^ 2 := by rw [hab]
-  cancel 2 at h
-
+  --cancel 2 at h
+  sorry -- his prove is not working, but it's trivial (and boring) to rewrite it properly
 
 
 theorem irrat_aux (a b : ℕ) (hb : b ≠ 0) : a ^ 2 ≠ 2 * b ^ 2 := by

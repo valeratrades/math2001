@@ -25,8 +25,6 @@ example : Bijective p := by
     calc p ((y + 5) / 2) = 2 * ((y + 5) / 2) - 5 := by rfl
       _ = y := by ring
 
-
-
 def a (t : ℝ) : ℝ := t ^ 3 - t
 
 example : ¬ Bijective a := by

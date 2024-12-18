@@ -131,10 +131,10 @@ def b : Humour → Humour
   | sanguine => sanguine
 
 def c : Humour → Humour
-  | melancholic => sorry
-  | choleric => sorry
-  | phlegmatic => sorry
-  | sanguine => sorry
+  | melancholic => sanguine
+  | choleric => phlegmatic
+  | phlegmatic => melancholic
+  | sanguine => phlegmatic
 
 example : b ∘ a = c := by
   ext x
@@ -143,25 +143,85 @@ example : b ∘ a = c := by
 
 def u (x : ℝ) : ℝ := 5 * x + 1
 
-noncomputable def v (x : ℝ) : ℝ := sorry
+noncomputable def v (y : ℝ) : ℝ := (y - 1) / 5
 
 example : Inverse u v := by
-  sorry
+  dsimp[Inverse]
+  constructor
+  . ext x
+    dsimp[u, v]
+    ring
+  . ext x
+    dsimp[v, u]
+    ring
 
 example {f : X → Y} (hf : Injective f) {g : Y → Z} (hg : Injective g) :
     Injective (g ∘ f) := by
-  sorry
+  dsimp[Injective] at *
+  intro x y h
+  have:= hg h
+  exact hf this
 
 example {f : X → Y} (hf : Surjective f) {g : Y → Z} (hg : Surjective g) :
     Surjective (g ∘ f) := by
-  sorry
+  dsimp[Surjective] at *
+  intro z
+  choose yx hyx using hf 
+  choose zy hzy using hg
+  use yx (zy z)
+  rw[hyx (zy z)]
+  rw[hzy z]
 
 example {f : X → Y} (hf : Surjective f) : ∃ g : Y → X, f ∘ g = id := by
-  sorry
+  choose yx hyx using hf
+  use yx
+  ext x
+  calc f (yx x)
+    _ = x := by rw[hyx x]
 
 example {f : X → Y} {g : Y → X} (h : Inverse f g) : Inverse g f := by
-  sorry
+  dsimp[Inverse] at *
+  exact ⟨h.2, h.1⟩
 
 example {f : X → Y} {g1 g2 : Y → X} (h1 : Inverse f g1) (h2 : Inverse f g2) :
     g1 = g2 := by
-  sorry
+  dsimp[Inverse] at *
+  ext x
+  calc g1 x
+    _ = g1 (id x) := rfl 
+    _ = g1 ((f ∘ g2) x) := by rw[h2.2]
+    _ = (g1 ∘ f) (g2 x) := rfl  
+    _ = id (g2 x) := by rw[h1.1]
+    _ = g2 x := rfl
+
+
+inductive X
+  | x1
+  deriving DecidableEq
+
+inductive Y
+  | y1
+  | y2
+  deriving DecidableEq
+
+inductive Z
+  | z1
+
+def ninjg: Y → Z
+  | _ => Z.z1
+
+def injf: X → Y
+  | x1 => Y.y1
+example: ¬∀ (X Y Z: Type) (f: X → Y) (g: Y → Z), Injective (g ∘ f) -> Injective g := by {
+  push_neg at *
+  use X, Y, Z, injf, ninjg
+  constructor
+  . dsimp[Injective]
+    intro z1 z2 h
+    rw[ninjg] at h
+  . dsimp[Injective]
+    push_neg at *
+    use Y.y1, Y.y2
+    dsimp[ninjg]
+    exhaust
+}

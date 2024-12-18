@@ -198,10 +198,19 @@ def e : Element → Element
   | air => water
 
 example : Bijective e := by
-  sorry
-
-example : ¬ Bijective e := by
-  sorry
+  dsimp[Bijective]
+  constructor
+  . 
+    intro x y h
+    dsimp[e] at h
+    cases x <;> cases y <;> exhaust
+  . 
+    intro y
+    cases y
+    . use earth; exhaust
+    . use air; exhaust
+    . use fire; exhaust
+    . use water; exhaust
 
 
 example : ∀ f : Subatomic → Subatomic, Injective f → Bijective f := by

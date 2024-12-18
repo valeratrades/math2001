@@ -174,13 +174,14 @@ example : Bijective (fun (x : ℝ) ↦ 4 - 3 * x) := by
     dsimp
     ring
 
-example : Bijective (fun (x : ℝ) ↦ x ^ 2 + 2 * x) := by
-  --(x + 1)^2 - 1
-  sorry
-
 example : ¬ Bijective (fun (x : ℝ) ↦ x ^ 2 + 2 * x) := by
-  sorry
-
+  dsimp[Bijective]
+  dsimp[Injective]
+  push_neg at *
+  left
+  use 2, -4
+  norm_num
+  
 inductive Element
   | fire
   | water

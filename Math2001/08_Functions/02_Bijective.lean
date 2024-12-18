@@ -214,8 +214,58 @@ example : Bijective e := by
 
 
 example : ∀ f : Subatomic → Subatomic, Injective f → Bijective f := by
-  sorry
+  dsimp[Injective, Bijective]
+  intro f
+  intro h
+  constructor
+  . exact h
+  dsimp[Surjective]
+  intro b
+  cases b
+  . 
+    cases hp : f Subatomic.proton with
+    | proton => use proton; exhaust
+    | neutron =>
+      cases hn : f Subatomic.neutron with
+      | proton => use neutron; exhaust
+      | neutron =>
+        have: f proton = f neutron := by { rw[hp, hn] }
+        have:= h this
+        exhaust
+      | electron =>
+        cases he : f Subatomic.electron with
+        | proton => use electron; exhaust
+        | neutron =>
+          have: f proton = f electron := by { rw[hp, he] }
+          have:= h this
+          exhaust
+        | electron =>
+          have: f electron = f neutron := by { rw[he, hn] }
+          have:= h this
+          exhaust
+    | electron =>
+      cases he : f Subatomic.electron with
+      | proton => use electron; exhaust
+      | neutron =>
+        cases hn : f Subatomic.neutron with
+        | proton => use neutron; exhaust
+        | neutron =>
+          have: f electron = f neutron := by { rw[he, hn] }
+          have:= h this
+          exhaust
+        | electron =>
+          have: f proton = f neutron := by { rw[hp, hn] }
+          have:= h this
+          exhaust
+      | electron =>
+        have: f electron = f proton := by { rw[he, hp] }
+        have:= h this
+        exhaust
+  -- Last two are exactly the same, just switch the order
+  . sorry
+  . sorry
 
 
 example : ∀ f : Element → Element, Injective f → Bijective f := by
+  -- uh, fuck no
   sorry

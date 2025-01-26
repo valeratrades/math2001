@@ -60,18 +60,6 @@ theorem gcd_nonneg (a b : ℤ) : 0 ≤ gcd a b := by
     addarith [ha]
 termination_by _ a b => b
 
-lemma bpos (b : ℤ) {a: ℤ} (h: 0 < b) (hdm: gcd b (fmod a b) ∣ fmod a b) (hdb: gcd b (fmod a b) ∣ b): gcd b (fmod a b) ∣ a := by
-  obtain ⟨kr, hkr⟩ := hdm
-  obtain ⟨kd, hkd⟩ := hdb
-  set r := fmod a b
-  set q := fdiv a b
-  use kr + kd * (fdiv a b)
-  calc a
-    _ = r + (b) * (fdiv a b) := by rw[fmod_add_fdiv]
-    _ = (gcd b r * kr) + (b) * (fdiv a b) := by nth_rw 1 [hkr]
-    _ = (gcd b r * kr) + (gcd b r * kd) * (fdiv a b) := by nth_rw 2 [hkd]
-    _ = (gcd b r) * (kr + kd * (fdiv a b)) := by ring
-
 
 theorem gcd_dvd (a b : ℤ) : gcd a b ∣ b ∧ gcd a b ∣ a := by
   rw [gcd]
@@ -81,57 +69,29 @@ theorem gcd_dvd (a b : ℤ) : gcd a b ∣ b ∧ gcd a b ∣ a := by
     obtain ⟨IH_right, IH_left⟩ := IH
     constructor
     · -- prove that `gcd a b ∣ b`
-      apply IH_left
+      sorry
     · -- prove that `gcd a b ∣ a`
-      exact bpos b h1 IH_right IH_left
+      sorry
   · -- case `b < 0`
     have IH : _ ∧ _ := gcd_dvd b (fmod a (-b)) -- inductive hypothesis
     obtain ⟨IH_right, IH_left⟩ := IH
     constructor
     · -- prove that `gcd a b ∣ b`
-      apply IH_left
+      sorry
     · -- prove that `gcd a b ∣ a`
-      clear h1
-      obtain ⟨kr, hkr⟩ := IH_right
-      obtain ⟨kd, hkd⟩ := IH_left
-      set r := fmod a (-b)
-      set q := fdiv a (-b)
-
-      use kr - kd * (fdiv a (-b))
-      calc a
-        _ = r + (-b) * (fdiv a (-b)) := by rw[fmod_add_fdiv]
-        _ = ((gcd b r) * kr) + (-b) * (fdiv a (-b)) := by nth_rw 1 [hkr]
-        _ = ((gcd b r) * kr) + (-(gcd b r * kd)) * (fdiv a (-b)) := by nth_rw 2 [hkd]
-        _ = (gcd b r) * (kr - kd * (fdiv a (-b))) := by ring
-
+      sorry
   · -- case `b = 0`, `0 ≤ a`
     constructor
     · -- prove that `gcd a b ∣ b`
-      have hb0: b = 0 := by {
-        apply le_antisymm
-        . exact h1
-        . exact h2
-      }
-      clear h1 h2
-      use 0
-      norm_num
-      exact hb0
+      sorry
     · -- prove that `gcd a b ∣ a`
-      norm_num
+      sorry
   · -- case `b = 0`, `a < 0`
-    have hb0: b = 0 := by {
-      apply le_antisymm
-      . exact h1
-      . exact h2
-    }
-    clear h1 h2
     constructor
     · -- prove that `gcd a b ∣ b`
-      use 0
-      norm_num
-      exact hb0
+      sorry
     · -- prove that `gcd a b ∣ a`
-      norm_num
+      sorry
 termination_by gcd_dvd a b => b
 
 
@@ -261,12 +221,4 @@ theorem bezout (a b : ℤ) : ∃ x y : ℤ, x * a + y * b = gcd a b := by
 
 
 theorem gcd_maximal {d a b : ℤ} (ha : d ∣ a) (hb : d ∣ b) : d ∣ gcd a b := by
-  --? split to L and R ?
-  have hlr:= L_mul_add_R_mul a b
-  obtain ⟨ka, hka⟩ := ha
-  obtain ⟨kb, hkb⟩ := hb
-  use (L a b) * ka + (R a b) * kb
-  calc (gcd a b)
-    _ = L a b * a + R a b * b := by rw[hlr]
-    _ = (L a b) * (d * ka) + (R a b) * (d * kb) := by rw[hka, hkb]
-    _ = d * ((L a b) * ka + (R a b) * kb) := by ring
+  sorry

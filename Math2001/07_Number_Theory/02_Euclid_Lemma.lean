@@ -44,7 +44,7 @@ theorem euclid_lemma_pow (a k p : ℕ) (hp : Prime p) (hk : 1 ≤ k) (H : p ∣ 
   · have ha : a ^ 1 = a := by ring
     rw [ha] at H
     apply H
-  have ha: a ^ (t + 1) = a * a ^ t := by ring
+  have ha : a ^ (t + 1) = a * a ^ t := by ring
   rw [ha] at H
   have key : p ∣ a ∨ p ∣ a ^ t := euclid_lemma hp H
   obtain h1 | h2 := key

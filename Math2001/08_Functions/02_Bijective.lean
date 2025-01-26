@@ -25,6 +25,8 @@ example : Bijective p := by
     calc p ((y + 5) / 2) = 2 * ((y + 5) / 2) - 5 := by rfl
       _ = y := by ring
 
+
+
 def a (t : ℝ) : ℝ := t ^ 3 - t
 
 example : ¬ Bijective a := by
@@ -125,18 +127,8 @@ example : ∀ f : Celestial → Celestial, Injective f → Bijective f := by
       apply h_sun
     · use moon
       apply h_moon
-  | moon, sun =>
-    dsimp[Surjective] at *
-    intro c
-    cases c
-    . use moon; exact h_moon
-    . use sun; exact h_sun
-  | moon, moon =>
-    have: sun = moon := by {
-      apply hf
-      rw[h_sun, h_moon]
-    }
-    contradiction
+  | moon, sun => sorry
+  | moon, moon => sorry
 
 
 example : ¬ ∀ f : ℕ → ℕ, Injective f → Bijective f := by
@@ -162,24 +154,18 @@ example : ¬ ∀ f : ℕ → ℕ, Injective f → Bijective f := by
 
 
 example : Bijective (fun (x : ℝ) ↦ 4 - 3 * x) := by
-  constructor
-  . intro x y h
-    dsimp at h
-    norm_num at h
-    exact h
-  . intro y
-    use (4 - y) / 3
-    dsimp
-    ring
+  sorry
+
+example : ¬ Bijective (fun (x : ℝ) ↦ 4 - 3 * x) := by
+  sorry
+
+
+example : Bijective (fun (x : ℝ) ↦ x ^ 2 + 2 * x) := by
+  sorry
 
 example : ¬ Bijective (fun (x : ℝ) ↦ x ^ 2 + 2 * x) := by
-  dsimp[Bijective]
-  dsimp[Injective]
-  push_neg at *
-  left
-  use 2, -4
-  norm_num
-  
+  sorry
+
 inductive Element
   | fire
   | water
@@ -196,74 +182,15 @@ def e : Element → Element
   | air => water
 
 example : Bijective e := by
-  dsimp[Bijective]
-  constructor
-  . 
-    intro x y h
-    dsimp[e] at h
-    cases x <;> cases y <;> exhaust
-  . 
-    intro y
-    cases y
-    . use earth; exhaust
-    . use air; exhaust
-    . use fire; exhaust
-    . use water; exhaust
+  sorry
+
+example : ¬ Bijective e := by
+  sorry
 
 
 example : ∀ f : Subatomic → Subatomic, Injective f → Bijective f := by
-  dsimp[Injective, Bijective]
-  intro f
-  intro h
-  constructor
-  . exact h
-  dsimp[Surjective]
-  intro b
-  cases b
-  . 
-    cases hp : f Subatomic.proton with
-    | proton => use proton; exhaust
-    | neutron =>
-      cases hn : f Subatomic.neutron with
-      | proton => use neutron; exhaust
-      | neutron =>
-        have: f proton = f neutron := by { rw[hp, hn] }
-        have:= h this
-        exhaust
-      | electron =>
-        cases he : f Subatomic.electron with
-        | proton => use electron; exhaust
-        | neutron =>
-          have: f proton = f electron := by { rw[hp, he] }
-          have:= h this
-          exhaust
-        | electron =>
-          have: f electron = f neutron := by { rw[he, hn] }
-          have:= h this
-          exhaust
-    | electron =>
-      cases he : f Subatomic.electron with
-      | proton => use electron; exhaust
-      | neutron =>
-        cases hn : f Subatomic.neutron with
-        | proton => use neutron; exhaust
-        | neutron =>
-          have: f electron = f neutron := by { rw[he, hn] }
-          have:= h this
-          exhaust
-        | electron =>
-          have: f proton = f neutron := by { rw[hp, hn] }
-          have:= h this
-          exhaust
-      | electron =>
-        have: f electron = f proton := by { rw[he, hp] }
-        have:= h this
-        exhaust
-  -- Last two are exactly the same, just switch the order
-  . sorry
-  . sorry
+  sorry
 
 
 example : ∀ f : Element → Element, Injective f → Bijective f := by
-  -- uh, fuck no
   sorry

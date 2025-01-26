@@ -41,7 +41,7 @@ theorem exists_prime_factor {n : ℕ} (hn2 : 2 ≤ n) : ∃ p : ℕ, Prime p ∧
       ring
   . -- case 2: `n` is not prime
     obtain ⟨m, hmn, _, ⟨x, hx⟩⟩ := exists_factor_of_not_prime hn hn2
-    have IH : ∃ p, Prime p ∧ p ∣ m := exists_prime_factor hmn -- inductive hypothesis. NB: can call it because have m < n
+    have IH : ∃ p, Prime p ∧ p ∣ m := exists_prime_factor hmn -- inductive hypothesis
     obtain ⟨p, hp, y, hy⟩ := IH
     use p
     constructor
@@ -54,28 +54,5 @@ theorem exists_prime_factor {n : ℕ} (hn2 : 2 ≤ n) : ∃ p : ℕ, Prime p ∧
 /-! # Exercises -/
 
 
-theorem extract_pow_two (n : ℕ) (hn : 0 < n) : ∃ a x, Odd x ∧ n = 2^a * x := by
-  cases (even_or_odd n) with
-  | inl he =>
-    obtain ⟨k, hke⟩ := he
-    have hkpos:=
-    calc 2*k
-      _ = n := by rw[hke]
-      _ > 0 := by rel[hn]
-      _ = 2*0 := by ring
-    cancel 2 at hkpos
-
-    have IHk:= extract_pow_two k hkpos
-    obtain ⟨a, x, ⟨IHo, IHp2⟩⟩ := IHk
-    use (a+1), x
-    constructor
-    . exact IHo
-    . calc n
-      _ = 2 * k := by rw[hke]
-      _ = 2 * (2^a * x) := by rw[IHp2]
-      _ = 2^(a+1) * x := by ring
-  | inr ho =>
-    use 0, n
-    constructor
-    . exact ho
-    . norm_num
+theorem extract_pow_two (n : ℕ) (hn : 0 < n) : ∃ a x, Odd x ∧ n = 2 ^ a * x := by
+  sorry

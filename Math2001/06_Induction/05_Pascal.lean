@@ -21,19 +21,19 @@ termination_by _ a b => a + b
 theorem pascal_le (a b : ℕ) : pascal a b ≤ (a + b)! := by
   match a, b with
   | a, 0 =>
-      calc pascal a 0 = 1 := by rw[pascal]
+      calc pascal a 0 = 1 := by rw [pascal]
         _ ≤ (a + 0)! := by apply factorial_pos
   | 0, b + 1 =>
-      calc pascal 0 (b + 1) = 1 := by rw[pascal]
+      calc pascal 0 (b + 1) = 1 := by rw [pascal]
         _ ≤ (0 + (b + 1))! := by apply factorial_pos
   | a + 1, b + 1 =>
       have IH1 := pascal_le (a + 1) b -- inductive hypothesis
       have IH2 := pascal_le a (b + 1) -- inductive hypothesis
-      calc pascal (a + 1) (b + 1) = pascal (a + 1) b + pascal a (b + 1) := by rw[pascal]
-        _ ≤ (a + 1 + b) ! + (a + (b + 1)) ! := by rel[IH1, IH2]
+      calc pascal (a + 1) (b + 1) = pascal (a + 1) b + pascal a (b + 1) := by rw [pascal]
+        _ ≤ (a + 1 + b) ! + (a + (b + 1)) ! := by rel [IH1, IH2]
         _ ≤ (a + b) * (a + b + 1) ! + (a + 1 + b) ! + (a + (b + 1)) !  := by extra
         _ = ((a + b + 1) + 1) * (a + b + 1)! := by ring
-        _ = ((a + b + 1) + 1)! := by rw[factorial, factorial, factorial]
+        _ = ((a + b + 1) + 1)! := by rw [factorial, factorial, factorial]
         _ = (a + 1 + (b + 1))! := by ring
 termination_by _ a b => a + b
 
@@ -81,33 +81,12 @@ example (a b : ℕ) : (pascal a b : ℚ) = (a + b)! / (a ! * b !) := by
 
 theorem pascal_symm (m n : ℕ) : pascal m n = pascal n m := by
   match m, n with
-  | 0, 0 => rw[pascal]
-  | a + 1, 0 => rw[pascal, pascal]
-  | 0, b + 1 => rw[pascal, pascal]
-  | a + 1, b + 1 =>
-    have IHl := pascal_symm (a+1) b
-    have IHr := pascal_symm a (b+1)
-    rw[pascal, pascal]
-    calc pascal (a + 1) b + pascal a (b + 1)
-    _ = pascal b (a + 1) + pascal (b + 1) a := by rw[IHl, IHr]
-    _  = pascal (b+1) a + pascal b (a + 1) := by ring
+  | 0, 0 => sorry
+  | a + 1, 0 => sorry
+  | 0, b + 1 => sorry
+  | a + 1, b + 1 => sorry
 termination_by _ a b => a + b
 
-example (a : ℕ) : pascal a 1 = a + 1 := by
-  simple_induction a with k IH
-  . rw[pascal]
-  . rw[pascal, pascal]; norm_num
-    calc 1 + pascal k 1
-      _ = 1 + (k + 1) := by rw[IH]
-      _ = k + 1 + 1 := by ring
 
--- this is so much better
-lemma pex (a: ℕ): pascal a 1 = a + 1 := by {
-  match a with
-  | 0 => rw[pascal]
-  | k + 1 =>
-    have IH := pex k
-    rw[pascal, pascal]
-    rw[IH]
-    ring
-}
+example (a : ℕ) : pascal a 1 = a + 1 := by
+  sorry

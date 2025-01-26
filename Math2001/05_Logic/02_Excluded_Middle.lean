@@ -43,29 +43,17 @@ theorem superpowered_one : Superpowered 1 := by
 #eval 3 ^ 3 ^ 1 + 1 -- 28
 #eval 3 ^ 3 ^ 2 + 1 -- 19684
 
-theorem not_superpowered_two: ¬ Superpowered 2 := by
-  intro h
-  have hfalse: Prime (2 ^ 2 ^ 5 + 1) := h 5
-  conv at hfalse => numbers
-  have not_prime: ¬ Prime 4294967297 := by {
-    apply not_prime 641 6700417
-    . numbers
-    . numbers
-    . numbers
-  }
-  contradiction
 
 theorem not_superpowered_three : ¬ Superpowered 3 := by
   intro h
   dsimp [Superpowered] at h
   have four_prime : Prime (3 ^ 3 ^ 0 + 1) := h 0
   conv at four_prime => numbers -- simplifies that statement to `Prime 4`
-  have four_not_prime : ¬ Prime 4 := by {
-    apply not_prime 2 2
+  have four_not_prime : ¬ Prime 4
+  · apply not_prime 2 2
     · numbers -- show `2 ≠ 1`
     · numbers -- show `2 ≠ 4`
     · numbers -- show `4 = 2 * 2`
-  }
   contradiction
 
 
@@ -91,52 +79,11 @@ example {P : Prop} (hP : ¬¬P) : P := by
 
 def Tribalanced (x : ℝ) : Prop := ∀ n : ℕ, (1 + x / n) ^ n < 3
 
-theorem not_tribalanced_two: ¬ Tribalanced 2 := by
-  intro H
-  dsimp[Tribalanced] at *
-  have h1:= H 1
-  have: 3 > (3 : ℝ) → False := fun a ↦ LT.lt.false a
-  apply this 
-  calc
-    3 > (1 + 2 / 1)^1 := by simpa using h1
-    _ = (3 : ℝ) := by ring
-
-theorem tribilanced_zero: Tribalanced 0 := by
-  intro H
-  conv => ring
-  numbers
-
 example : ∃ x : ℝ, Tribalanced x ∧ ¬ Tribalanced (x + 1) := by
-  by_cases h1: Tribalanced 1
-  . use 1
-    constructor
-    . apply h1
-    . conv => ring
-      apply not_tribalanced_two
-  . use 0
-    constructor
-    . apply tribilanced_zero
-    . conv => ring
-      apply h1
-
-
+  sorry
 
 example (P Q : Prop) : (¬P → ¬Q) ↔ (Q → P) := by
-  constructor
-  . intro H
-    intro hq
-    by_cases hp: P
-    . exact hp
-    . have hnq:= H hp
-      contradiction
-  . intro hqtp
-    intro hnp
-    intro hnq
-    have hp:= hqtp hnq
-    contradiction
+  sorry
 
 example : ∃ k : ℕ, Superpowered k ∧ ¬ Superpowered (k + 1) := by
-  use 1
-  constructor
-  . apply superpowered_one
-  . apply not_superpowered_two
+  sorry

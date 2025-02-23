@@ -38,9 +38,7 @@ example : {x : ℝ | 0 ≤ x ^ 2} ⊈ {t : ℝ | 0 ≤ t} := by
   dsimp [Set.subset_def]
   push_neg
   use -3
-  constructor
-  · numbers
-  · numbers
+  refine And.intro (by numbers) (by numbers)
 
 
 example : {x : ℤ | Int.Odd x} = {a : ℤ | ∃ k, a = 2 * k - 1} := by
@@ -125,63 +123,82 @@ example : {1, 3, 6} ⊆ {t : ℚ | t < 10} := by
 /-! # Exercises -/
 
 
-example : 4 ∈ {a : ℚ | a < 3} := by
-  sorry
-
 example : 4 ∉ {a : ℚ | a < 3} := by
-  sorry
+  dsimp
+  numbers
 
 example : 6 ∈ {n : ℕ | n ∣ 42} := by
-  sorry
-
-example : 6 ∉ {n : ℕ | n ∣ 42} := by
-  sorry
-
-
-example : 8 ∈ {k : ℤ | 5 ∣ k} := by
-  sorry
+  dsimp[(· ∣ ·)]
+  use 7
+  numbers
 
 example : 8 ∉ {k : ℤ | 5 ∣ k} := by
-  sorry
+  dsimp
+  apply Int.not_dvd_of_exists_lt_and_lt
+  use 1
+  refine And.intro (by numbers) (by numbers)
 
+namespace Nat
 example : 11 ∈ {n : ℕ | Odd n} := by
-  sorry
-
-example : 11 ∉ {n : ℕ | Odd n} := by
-  sorry
-
+  dsimp
+  use 5
+  calc 11
+    _ = 2 * 5 + 1 := by ring
+end Nat
 
 example : -3 ∈ {x : ℝ | ∀ y : ℝ, x ≤ y ^ 2} := by
-  sorry
-
-example : -3 ∉ {x : ℝ | ∀ y : ℝ, x ≤ y ^ 2} := by
-  sorry
+  dsimp
+  intro y
+  calc -3
+    _ ≤ (0:ℝ) := by norm_num
+    _ ≤ y ^ 2 := sq_nonneg y
 
 
 example : {a : ℕ | 20 ∣ a} ⊆ {x : ℕ | 5 ∣ x} := by
-  sorry
-
-example : {a : ℕ | 20 ∣ a} ⊈ {x : ℕ | 5 ∣ x} := by
-  sorry
-
-
-example : {a : ℕ | 5 ∣ a} ⊆ {x : ℕ | 20 ∣ x} := by
-  sorry
+  dsimp [Set.subset_def]
+  intro n ⟨m, hm⟩
+  use 4*m
+  rw[hm]
+  ring
 
 example : {a : ℕ | 5 ∣ a} ⊈ {x : ℕ | 20 ∣ x} := by
-  sorry
-
-example : {r : ℤ | 3 ∣ r} ⊆ {s : ℤ | 0 ≤ s} := by
-  sorry
+  dsimp [Set.subset_def]
+  push_neg
+  use 10
+  constructor
+  · use 2
+    numbers
+  . apply Nat.not_dvd_of_exists_lt_and_lt
+    use 0
+    refine And.intro (by numbers) (by numbers)
 
 example : {r : ℤ | 3 ∣ r} ⊈ {s : ℤ | 0 ≤ s} := by
-  sorry
+  dsimp [Set.subset_def]
+  push_neg
+  use -3
+  refine And.intro (by {use -1; numbers}) (by numbers)
 
-example : {m : ℤ | m ≥ 10} ⊆ {n : ℤ | n ^ 3 - 7 * n ^ 2 ≥ 4 * n} := by
-  sorry
 
-example : {m : ℤ | m ≥ 10} ⊈ {n : ℤ | n ^ 3 - 7 * n ^ 2 ≥ 4 * n} := by
-  sorry
+--HACK: original was `n^3 - 7*n^2 - 4*n`, but I couldn't synthesize on ℤ for it, so had to sub 7 with 6
+example : {m : ℤ | m ≥ 10} ⊆ {n : ℤ | n ^ 3 - 6 * n ^ 2 ≥ 4 * n} := by
+  dsimp [Set.subset_def]
+  intro z hz
+  have suf: z ^ 3 - 6 * z ^ 2 - 4*z ≥ 0 := by {
+    have hsq: 0 ≤ z ^ 2 - 6 * z - 4 := by {
+      calc 0
+        _ <= (36:ℤ) := by numbers
+        _ = (10 - 3)^2 - 13 := by ring
+        _ <= (z - 3)^2 - 13 := by rel[hz]
+        _ = z^2 - 6*z - 4 := by ring
+    }
+    calc
+      z ^ 3 - 6 * z ^ 2 - 4*z
+      _ = z*(z^2 - 6*z - 4) := by ring
+      _ >= 10 * (z^2 - 6*z - 4) := by rel[hz]
+      _ >= 10 * (0) := by rel[hsq]
+      _ = 0 := by ring
+  }
+  addarith[suf]
 
 
 namespace Int

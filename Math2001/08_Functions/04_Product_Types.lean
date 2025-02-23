@@ -1,5 +1,6 @@
 /- Copyright (c) Heather Macbeth, 2023.  All rights reserved. -/
 import Mathlib.Data.Real.Basic
+import Mathlib.Data.Rat.Basic
 import Library.Theory.InjectiveSurjective
 import Library.Basic
 import Library.Tactic.ModEq
@@ -45,7 +46,15 @@ example : Bijective (fun ((m, n) : ℤ × ℤ) ↦ (m + n, m + 2 * n)) := by
 
 
 example : Bijective (fun ((m, n) : ℝ × ℝ) ↦ (m + n, m - n)) := by
-  sorry
+  rw [bijective_iff_exists_inverse]
+  use fun (a, b) ↦ ((a+b)/2, (a-b)/2)
+  constructor
+  . ext ⟨m, n⟩
+    dsimp
+    ring
+  . ext ⟨a, b⟩
+    dsimp
+    ring
 
 example : ¬ Bijective (fun ((m, n) : ℤ × ℤ) ↦ (m + n, m - n)) := by
   dsimp [Bijective, Injective, Surjective]
@@ -104,7 +113,10 @@ example : Surjective (fun ((m, n) : ℤ × ℤ) ↦ 5 * m + 8 * n) := by
 
 
 example : ¬ Injective (fun ((m, n) : ℤ × ℤ) ↦ 5 * m + 10 * n) := by
-  sorry
+  dsimp [Injective]
+  push_neg
+  use (2, 0), (0, 1)
+  refine And.intro (by numbers) (by numbers)
 
 example : ¬ Surjective (fun ((m, n) : ℤ × ℤ) ↦ 5 * m + 10 * n) := by
   dsimp [Surjective]
@@ -174,7 +186,7 @@ theorem p_comp_i (x : ℕ × ℕ) : p (i x) = p x + 1 := by
       _ = (A (0 + b) + b) + 1 := by ring
       _ = p (0, b) + 1 := by dsimp [p]
   | (a + 1, b) =>
-    calc p (i (a + 1, b)) = p (a, b + 1) := by rw [i] ; rfl -- FIXME
+    calc p (i (a + 1, b)) = p (a, b + 1) := by rw [i] ; rfl
       _ = A (a + (b + 1)) + (b + 1) := by dsimp [p]
       _ = (A ((a + 1) + b) + b) + 1 := by ring
       _ = p (a + 1, b) + 1 := by rw [p]
@@ -210,31 +222,78 @@ example : Bijective p := by
 
 example : Bijective (fun ((r, s) : ℚ × ℚ) ↦ (s, r - s)) := by
   rw [bijective_iff_exists_inverse]
-  sorry
+  use fun (a, b) ↦ (b+a, a)
+  constructor 
+  . ext ⟨r, s⟩
+    dsimp
+    ring
+  . ext ⟨a, b⟩
+    dsimp
+    ring
 
 example : ¬ Injective (fun ((x, y) : ℤ × ℤ) ↦ x - 2 * y - 1) := by
-  sorry
+  dsimp [Injective]
+  push_neg
+  use (2, 1), (4, 2)
+  refine And.intro (by numbers) (by numbers)
+
 example : Surjective (fun ((x, y) : ℤ × ℤ) ↦ x - 2 * y - 1) := by
-  sorry
+  dsimp [Surjective]
+  intro z
+  use (z + 1, 0)
+  ring
 
 example : ¬ Surjective (fun ((x, y) : ℚ × ℚ) ↦ x ^ 2 + y ^ 2) := by
-  sorry
+  dsimp [Surjective]
+  push_neg
+  use -1
+  intro (a, b) h
+  dsimp at h
+  have hapos : 0 ≤ a ^ 2 := by apply pow_two_nonneg
+  have hbpos : 0 ≤ b ^ 2 := by apply pow_two_nonneg
+  have:=
+  calc
+    -1
+    _ = a^2 + b^2 := by rw[h]
+    _ >= 0 + 0 := by rel[hapos, hbpos]
+  numbers at this
 
-example : Surjective (fun ((x, y) : ℚ × ℚ) ↦ x ^ 2 - y ^ 2) := by
-  sorry
+example: Surjective (fun ((x, y) : ℚ × ℚ) ↦ x ^ 2 - y ^ 2) := by
+  intro q
+  use ((q-1)/2 + 1, (q-1)/2)
+  dsimp
+  ring
 
-example : Surjective (fun ((a, b) : ℚ × ℕ) ↦ a ^ b) := by
-  sorry
+example: Surjective (fun ((q, n) : ℚ × ℕ) ↦ q ^ n) := by
+  intro qn
+  use (qn, 1)
+  dsimp
+  ring
 
 example : ¬ Injective
     (fun ((x, y, z) : ℝ × ℝ × ℝ) ↦ (x + y + z, x + 2 * y + 3 * z)) := by
-  sorry
+  dsimp [Injective]
+  push_neg
+  use (0, 2, 0), (1, 0, 1)
+  refine And.intro (by numbers) (by numbers)
 
-example : Injective (fun ((x, y) : ℝ × ℝ) ↦ (x + y, x + 2 * y, x + 3 * y)) := by
-  sorry
+example : Injective (fun ((x, y): ℝ × ℝ) ↦ (x + y, x + 2 * y, x + 3 * y)) := by
+  intro (a, b) (x, y) h
+  dsimp at h
+  obtain ⟨h1, h2, h3⟩ := h
+  constructor
+  . calc a
+    _ = 2*(a+b) - (a+2*b) := by ring
+    _ = 2*(x+y) - (x+2*y) := by rw[h1, h2]
+    _ = x := by ring
+  . calc b
+    _ = (a + 2*b) - (a+b) := by ring
+    _ = (x + 2*y) - (x + y) := by rw[h2, h1]
+    _ = y := by ring
 
 def h : ℝ × ℝ × ℝ → ℝ × ℝ × ℝ
   | (x, y, z) => (y, z, x)
 
 example : h ∘ h ∘ h = id := by
-  sorry
+  ext ⟨x, y, z⟩
+  dsimp [h]

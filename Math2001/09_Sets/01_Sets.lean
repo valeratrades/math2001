@@ -203,37 +203,110 @@ example : {m : ℤ | m ≥ 10} ⊆ {n : ℤ | n ^ 3 - 6 * n ^ 2 ≥ 4 * n} := by
 
 namespace Int
 example : {n : ℤ | Even n} = {a : ℤ | a ≡ 6 [ZMOD 2]} := by
-  sorry
-
-example : {n : ℤ | Even n} ≠ {a : ℤ | a ≡ 6 [ZMOD 2]} := by
-  sorry
+  ext z
+  constructor
+  . dsimp[Set.subset_def]
+    dsimp[Even]
+    intro ⟨k, hk⟩
+    calc z
+      _ = 2 * k := by rw [hk]
+      _ ≡ 0 [ZMOD 2] := by extra
+      _ = 6 - 2*3 := by numbers
+      _ ≡ 6 [ZMOD 2] := by extra
+  . dsimp[Set.subset_def]
+    dsimp[Even]
+    intro hm
+    have:=
+    calc z
+      _ ≡ 6 [ZMOD 2] := by rel[hm]
+      _ = 0 + 2*3 := by numbers
+      _ ≡ 0 [ZMOD 2] := by extra
+      _ = 2 * 0 := by numbers
+    obtain ⟨q, hq⟩ := this; norm_num at hq
+    use q
+    exact hq
 end Int
 
-
-example : {t : ℝ | t ^ 2 - 5 * t + 4 = 0} = {4} := by
-  sorry
-
 example : {t : ℝ | t ^ 2 - 5 * t + 4 = 0} ≠ {4} := by
-  sorry
-
-example : {k : ℤ | 8 ∣ 6 * k} = {l : ℤ | 8 ∣ l} := by
-  sorry
+  ext
+  dsimp
+  push_neg
+  use 1; left
+  refine And.intro (by norm_num) (by norm_num)
 
 example : {k : ℤ | 8 ∣ 6 * k} ≠ {l : ℤ | 8 ∣ l} := by
-  sorry
+  ext
+  dsimp
+  push_neg
+  use 4
+  left
+  constructor
+  . use 3
+    numbers
+  . 
+    apply Int.not_dvd_of_exists_lt_and_lt
+    use 0
+    refine And.intro (by numbers) (by numbers)
 
+namespace Int
 example : {k : ℤ | 7 ∣ 9 * k} = {l : ℤ | 7 ∣ l} := by
-  sorry
-
-example : {k : ℤ | 7 ∣ 9 * k} ≠ {l : ℤ | 7 ∣ l} := by
-  sorry
-
-
-example : {1, 2, 3} = {1, 2} := by
-  sorry
+  ext z
+  dsimp
+  constructor
+  . 
+    intro h
+    obtain ⟨c, hc⟩ := h
+    have bezout : 4 * 7 + (-3) * 9 = 1 := by norm_num
+    have key : 4 * 7 * z + (-3) * (9 * z) = z := by
+      calc 4 * 7 * z + (-3) * (9 * z)
+        _ = (4 * 7 + (-3) * 9) * z := by ring
+        _ = 1 * z := by rw [bezout]
+        _ = z := by ring
+    have : 4 * 7 * z + (-3) * (7 * c) = z := by
+      calc 4 * 7 * z + (-3) * (7 * c)
+        _ = 4 * 7 * z + (-3) * (9 * z) := by rw[hc]
+        _ = z := by exact key
+    have : 7 * (4 * z + (-3) * c) = z := by
+      calc 7 * (4 * z + (-3) * c)
+        _ = 7 * 4 * z + 7 * (-3) * c := by ring
+        _ = 4 * 7 * z + (-3) * (7 * c) := by ring
+        _ = z := by rw[this]
+    use (4 * z + (-3) * c)
+    exact this.symm
+  . intro ⟨c, hc⟩
+    use 9*c
+    calc 9*z
+      _ = 9*(7*c) := by rw [hc]
+      _ = 7*(9*c) := by ring
+end Int
 
 example : {1, 2, 3} ≠ {1, 2} := by
-  sorry
+  ext
+  dsimp
+  push_neg
+  use 3
+  left
+  norm_num
 
 example : {x : ℝ | x ^ 2 + 3 * x + 2 = 0} = {-1, -2} := by
-  sorry
+  ext x
+  dsimp
+  constructor
+  . intro h
+    have:=
+    calc (x+1)*(x+2)
+      _ = x^2 + 3*x + 2 := by ring
+      _ = 0 := by rw[h]
+    match mul_eq_zero.mp this with
+    | Or.inl h1 => left; addarith[h1]
+    | Or.inr h2 => right; addarith[h2]
+  . intro h
+    match h with
+    | .inl hm1 => 
+      calc x^2 + 3*x + 2
+        _ = (-1)^2 + 3*(-1) + 2 := by rw[hm1]
+        _ = 0 := by ring
+    | .inr hm2 =>
+      calc x^2 + 3*x + 2
+        _ = (-2)^2 + 3*(-2) + 2 := by rw[hm2]
+        _ = 0 := by ring

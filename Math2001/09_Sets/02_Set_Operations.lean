@@ -129,26 +129,110 @@ example : {x : ℝ | -1 < x} ∪ {x : ℝ | x < 1} = univ := by
 macro "check_equality_of_explicit_sets" : tactic => `(tactic| (ext; dsimp; exhaust))
 
 
-example : {-1, 2, 4, 4} ∪ {3, -2, 2} = sorry := by check_equality_of_explicit_sets
+example : {-1, 2, 4, 4} ∪ {3, -2, 2} = {-2, -1, 2, 3, 4} := by ext; dsimp; exhaust
 
-example : {0, 1, 2, 3, 4} ∩ {0, 2, 4, 6, 8} = sorry := by
-  check_equality_of_explicit_sets
+example : {0, 1, 2, 3, 4} ∩ {0, 2, 4, 6, 8} = {0, 2, 4} := by
+  ext; dsimp; exhaust
 
-example : {1, 2} ∩ {3} = sorry := by check_equality_of_explicit_sets
+example : {1, 2} ∩ {3} = {} := by ext; dsimp; exhaust
 
-example : {3, 4, 5}ᶜ ∩ {1, 3, 5, 7, 9} = sorry := by
-  check_equality_of_explicit_sets
+example : {3, 4, 5}ᶜ ∩ {1, 3, 5, 7, 9} = {1, 7, 9} := by
+  ext; dsimp; exhaust
+
 
 example : {r : ℤ | r ≡ 7 [ZMOD 10] }
     ⊆ {s : ℤ | s ≡ 1 [ZMOD 2]} ∩ {t : ℤ | t ≡ 2 [ZMOD 5]} := by
-  sorry
+  dsimp [Set.subset_def]
+  intro z h
+  constructor
+  . 
+    have:=
+    calc z
+      _ ≡ 7 [ZMOD 10] := by rel [h]
+      _ = 7 := by norm_num
+      _ = 1 + 2 * 3 := by ring
+    obtain ⟨x, hx⟩ := this
+
+    calc z
+      _ = 10*x + (1+2*3) := by addarith[hx]
+      _ = 1 + 2*(5*x + 3) := by ring
+      _ ≡ 1 [ZMOD 2] := by extra
+
+  . 
+    have:=
+    calc z
+      _ ≡ 7 [ZMOD 10] := by rel [h]
+      _ = 7 := by norm_num
+      _ = 2 + 5*1 := by norm_num
+    obtain ⟨x, hx⟩ := this
+    
+    calc z
+      _ = 10*x + (2+5*1) := by addarith[hx]
+      _ = 2 + 5*(2*x + 1) := by ring
+      _ ≡ 2 [ZMOD 5] := by extra
 
 example : {n : ℤ | 5 ∣ n} ∩ {n : ℤ | 8 ∣ n} ⊆ {n : ℤ | 40 ∣ n} := by
-  sorry
+  dsimp [Set.subset_def]
+  intro z ⟨⟨a, h5⟩, ⟨b, h8⟩⟩
+  use 2*a - 3*b
+  calc z
+    _ = 16*(z) - 15*(z) := by ring
+    _ = 16*(5*a) - 15*(z) := by rw [h5]
+    _ = 16*(5*a) - 15*(8*b) := by rw [h8]
+    _ = 40*(2*a - 3*b) := by ring
 
+namespace Int
 example :
     {n : ℤ | 3 ∣ n} ∪ {n : ℤ | 2 ∣ n} ⊆ {n : ℤ | n ^ 2 ≡ 1 [ZMOD 6]}ᶜ := by
-  sorry
+  dsimp [Set.subset_def]
+  intro z h
+  match h with
+  | .inl ⟨c, h3⟩ =>
+    intro h
+    have h0:=
+    calc z^2
+      _ = (3*c)^2 := by rw[h3]
+      _ = 0 + 3*(3*c^2) := by ring
+      _ ≡ 0 [ZMOD 3] := by extra
+
+    have h1: z^2 ≡ 1 [ZMOD 3] := by {
+      dsimp[Int.ModEq] at *
+      obtain ⟨k, hk⟩ := h
+      use 2*k
+      calc z^2 - 1
+        _ = 6*k := by rw[hk]
+        _ = 3*(2*k) := by ring
+    }
+    
+    have:=
+    calc 1
+      _ ≡ z^2 [ZMOD 3] := by rel[h1]
+      _ ≡ 0 [ZMOD 3] := by rel[h0]
+    numbers at this
+
+  | .inr ⟨c, h2⟩ =>
+    intro h
+    have h0:=
+    calc z^2
+      _ = (2*c)^2 := by rw[h2]
+      _ = 0 + 2*(2*c^2) := by ring
+      _ ≡ 0 [ZMOD 2] := by extra
+
+    have h1: z^2 ≡ 1 [ZMOD 2] := by {
+      dsimp[Int.ModEq] at *
+      obtain ⟨k, hk⟩ := h
+      use 3*k
+      calc z^2 - 1
+        _ = 6*k := by rw[hk]
+        _ = 2*(3*k) := by ring
+    }
+    
+    have:=
+    calc 1
+      _ ≡ z^2 [ZMOD 2] := by rel[h1]
+      _ ≡ 0 [ZMOD 2] := by rel[h0]
+    numbers at this
+end Int
 
 def SizeAtLeastTwo (s : Set X) : Prop := ∃ x1 x2 : X, x1 ≠ x2 ∧ x1 ∈ s ∧ x2 ∈ s
 def SizeAtLeastThree (s : Set X) : Prop :=
@@ -157,4 +241,17 @@ def SizeAtLeastThree (s : Set X) : Prop :=
 example {s t : Set X} (hs : SizeAtLeastTwo s) (ht : SizeAtLeastTwo t)
     (hst : ¬ SizeAtLeastTwo (s ∩ t)) :
     SizeAtLeastThree (s ∪ t) := by
+  dsimp [SizeAtLeastTwo, SizeAtLeastThree] at *
+  push_neg at *
+  obtain ⟨x1, x2, hx12, hx1i, hx2i⟩ := hs
+  obtain ⟨y1, y2, hy12, hy1i, hy2i⟩ := ht
+
+  use x1, x2
+  simp
+  constructor
+  . exact hx12
+
+  -- match on matrix {x,y} (4-split)
+  -- actually, no clue how to expand exhausts here
+
   sorry

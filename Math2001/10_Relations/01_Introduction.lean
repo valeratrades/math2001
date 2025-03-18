@@ -171,14 +171,28 @@ end
 
 
 example : ¬ Symmetric ((·:ℝ) < ·) := by
-  sorry
+  dsimp [Symmetric]
+  push_neg
+  use 1,2
+  norm_num
 
 section
 local infix:50 "∼" => fun (x y : ℤ) ↦ x ≡ y [ZMOD 2]
 
 example : ¬ AntiSymmetric (· ∼ ·) := by
-  sorry
-
+  dsimp [AntiSymmetric]
+  push_neg
+  use 1,3
+  constructor
+  . calc (1:ℤ)
+    _ ≡ 1 [ZMOD 2] := by extra
+    _ ≡ 1 + 2*1 [ZMOD 2] := by extra
+    _ = 3 := by ring
+  . constructor
+    . calc (3:ℤ)
+      _ = 1 + 2*1 := by ring
+      _ ≡ 1 [ZMOD 2] := by extra
+    . numbers
 end
 
 
@@ -213,144 +227,160 @@ open Little
 local infix:50 " ∼ " => s
 
 
-example : Reflexive (· ∼ ·) := by
-  sorry
-
 example : ¬ Reflexive (· ∼ ·) := by
-  sorry
+  dsimp[Reflexive]
+  push_neg
+  use beth
+  dsimp[s]
+  norm_num
 
 example : Symmetric (· ∼ ·) := by
-  sorry
-
-example : ¬ Symmetric (· ∼ ·) := by
-  sorry
-
-example : AntiSymmetric (· ∼ ·) := by
-  sorry
+  intro x y h
+  cases x <;> cases y <;> exhaust
 
 example : ¬ AntiSymmetric (· ∼ ·) := by
-  sorry
-
-example : Transitive (· ∼ ·) := by
-  sorry
+  dsimp[AntiSymmetric]
+  push_neg
+  use jo, meg
+  dsimp[s]
+  exhaust
 
 example : ¬ Transitive (· ∼ ·) := by
-  sorry
-
+  dsimp[Transitive]
+  push_neg
+  use amy, meg, jo
+  exhaust
 end
 
 
 section
-local infix:50 "∼" => fun (x y : ℤ) ↦ y ≡ x + 1 [ZMOD 5]
-
-example : Reflexive (· ∼ ·) := by
-  sorry
+local infix:50 "∼" => fun (x y : ℤ) ↦ x ≡ y + 1 [ZMOD 5]
 
 example : ¬ Reflexive (· ∼ ·) := by
-  sorry
-
-example : Symmetric (· ∼ ·) := by
-  sorry
+  dsimp [Reflexive]
+  push_neg
+  use 1
+  norm_num
 
 example : ¬ Symmetric (· ∼ ·) := by
-  sorry
+  dsimp [Symmetric]; push_neg
+  use 2, 1
+  norm_num
 
 example : AntiSymmetric (· ∼ ·) := by
-  sorry
+  intro a b hab hba
+  have ha2:=
+  calc a
+    _ ≡ b + 1 [ZMOD 5] := by rel [hab]
+    _ ≡ a + 1 + 1 [ZMOD 5] := by rel [hba]
+    _ = a + 2 := by ring
+  have ha4:=
+  calc a + 2
+    _ ≡ b + 1 + 2 [ZMOD 5] := by rel [hab]
+    _ ≡ a + 1 + 1 + 2 [ZMOD 5] := by rel [hba]
+    _ = a + 4 := by ring
 
-example : ¬ AntiSymmetric (· ∼ ·) := by
-  sorry
-
-example : Transitive (· ∼ ·) := by
-  sorry
+  have:=
+  calc 2
+    _ ≡ 2 [ZMOD 5] := by extra
+    _ = (a + 2) - a := by ring
+    _ ≡ (a + 4) - a [ZMOD 5] := by rel [ha4]
+    _ = 4 := by ring
+  numbers at this
 
 example : ¬ Transitive (· ∼ ·) := by
-  sorry
-
+  dsimp[Transitive]; push_neg
+  use 3,2,1
+  norm_num
 end
 
 
 section
 local infix:50 "∼" => fun (x y : ℤ) ↦ x + y ≡ 0 [ZMOD 3]
 
-example : Reflexive (· ∼ ·) := by
-  sorry
-
 example : ¬ Reflexive (· ∼ ·) := by
-  sorry
+  dsimp[Reflexive]; push_neg
+  use 1
+  norm_num
 
 example : Symmetric (· ∼ ·) := by
-  sorry
-
-example : ¬ Symmetric (· ∼ ·) := by
-  sorry
-
-example : AntiSymmetric (· ∼ ·) := by
-  sorry
+  intro a b h
+  calc b + a
+    _ = a + b := by ring
+    _ ≡ 0 [ZMOD 3] := by rel [h]
 
 example : ¬ AntiSymmetric (· ∼ ·) := by
-  sorry
-
-example : Transitive (· ∼ ·) := by
-  sorry
+  dsimp[AntiSymmetric]; push_neg
+  use 1,2
+  norm_num
+  calc (3:ℤ)
+    _ = 0 + 3*1 := by ring
+    _ ≡ 0 [ZMOD 3] := by extra
 
 example : ¬ Transitive (· ∼ ·) := by
-  sorry
-
+  dsimp[Transitive]; push_neg
+  use 1,2,1
+  norm_num
+  calc (3:ℤ)
+    _ = 0 + 3*1 := by ring
+    _ ≡ 0 [ZMOD 3] := by extra
 end
 
 
 example : Reflexive ((· : Set ℕ) ⊆ ·) := by
-  sorry
-
-example : ¬ Reflexive ((· : Set ℕ) ⊆ ·) := by
-  sorry
-
-example : Symmetric ((· : Set ℕ) ⊆ ·) := by
-  sorry
+  intro A a h
+  exact h
 
 example : ¬ Symmetric ((· : Set ℕ) ⊆ ·) := by
-  sorry
+  dsimp[Symmetric]; push_neg
+  use {1}, {1,2}
+  norm_num
 
 example : AntiSymmetric ((· : Set ℕ) ⊆ ·) := by
-  sorry
-
-example : ¬ AntiSymmetric ((· : Set ℕ) ⊆ ·) := by
-  sorry
+  intro A B haib hbia
+  dsimp[Set.subset_def] at *
+  ext x
+  apply Iff.intro
+  · intro a
+    simp_all only
+  · intro a
+    simp_all only
 
 example : Transitive ((· : Set ℕ) ⊆ ·) := by
-  sorry
-
-example : ¬ Transitive ((· : Set ℕ) ⊆ ·) := by
-  sorry
-
-
+  intro A B C hab hbc x h
+  dsimp[Set.subset_def] at *
+  have hb:= hab x h
+  exact hbc x hb
 
 section
 local infix:50 "≺" => fun ((x1, y1) : ℝ × ℝ) (x2, y2) ↦ (x1 ≤ x2 ∧ y1 ≤ y2)
 
 example : Reflexive (· ≺ ·) := by
-  sorry
-
-example : ¬ Reflexive (· ≺ ·) := by
-  sorry
-
-example : Symmetric (· ≺ ·) := by
-  sorry
+  intro (x, y)
+  norm_num
 
 example : ¬ Symmetric (· ≺ ·) := by
-  sorry
+  dsimp[Symmetric]; push_neg
+  use (1,1), (2,2)
+  norm_num
 
 example : AntiSymmetric (· ≺ ·) := by
-  sorry
-
-example : ¬ AntiSymmetric (· ≺ ·) := by
-  sorry
+  intro (x1, y1) (x2, y2) h1 h2
+  simp_all only
+  have hx:= le_antisymm h1.1 h2.1
+  have hy:= le_antisymm h1.2 h2.2
+  rw[hx, hy]
 
 example : Transitive (· ≺ ·) := by
-  sorry
-
-example : ¬ Transitive (· ≺ ·) := by
-  sorry
-
+  intro (x1, y1) (x2, y2) (x3, y3) h12 h23
+  simp_all only
+  have hx:=
+  calc x1
+    _ ≤ x2 := h12.1
+    _ ≤ x3 := h23.1
+  have hy:=
+  calc y1
+    _ ≤ y2 := h12.2
+    _ ≤ y3 := h23.2
+  exact ⟨hx, hy⟩
 end

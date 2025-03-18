@@ -168,13 +168,28 @@ section
 local infix:50 "∼" => fun (a b : ℤ) ↦ ∃ m n, m > 0 ∧ n > 0 ∧ a * m = b * n
 
 example : Reflexive (· ∼ ·) := by
-  sorry
+  intro x
+  use 1,1
+  norm_num
 
 example : Symmetric (· ∼ ·) := by
-  sorry
+  intro x y ⟨m, n, hm, hn, h⟩
+  simp_all only
+  use n, m
+  simp_all only
+  norm_num
 
 example : Transitive (· ∼ ·) := by
-  sorry
+  intro x y z ⟨m, n, hm, hn, h1⟩ ⟨p, q, hp, hq, h2⟩
+  simp_all only
+  use m * p, n * q
+  simp_all
+  calc x * (m*p)
+    _ = (x * m) * p := by ring
+    _ = (y * n) * p := by rw[h1]
+    _ = (y * p) * n := by ring
+    _ = (z * q) * n := by rw[h2]
+    _ = z * (n*q) := by ring
 
 end
 
@@ -183,28 +198,54 @@ section
 local infix:50 "∼" => fun ((a, b) : ℕ × ℕ) (c, d) ↦ a + d = b + c
 
 example : Reflexive (· ∼ ·) := by
-  sorry
+  intro (a, b)
+  simp_all
+  ring
 
 example : Symmetric (· ∼ ·) := by
-  sorry
+  intro (a, b) (c, d) h
+  simp_all only
+  addarith[h]
 
 example : Transitive (· ∼ ·) := by
-  sorry
+  intro (a, b) (c, d) (e, f) h1 h2
+  simp_all only
+  addarith[h1, h2]
 
 end
 
 
 section
 local infix:50 "∼" => fun ((a, b) : ℤ × ℤ) (c, d) ↦
-  ∃ m n, m > 0 ∧ n > 0 ∧ m * b * (b ^ 2 - 3 * a ^ 2) = n * d * (d ^ 2 - 3 * c ^ 2)
+  ∃ m n, m > 0 ∧ n > 0 ∧ m * (b * (b ^ 2 - 3 * a ^ 2)) = n * (d * (d ^ 2 - 3 * c ^ 2))
 
 example : Reflexive (· ∼ ·) := by
-  sorry
+  intro (a, b)
+  simp_all only
+  use 1,1
+  norm_num
 
 example : Symmetric (· ∼ ·) := by
-  sorry
+  intro (a, b) (c, d) ⟨m, n, hm, hn, h⟩
+  simp_all only
+  use n,m
+  simp_all only
+  norm_num
 
 example : Transitive (· ∼ ·) := by
-  sorry
+  intro (a, b) (c, d) (e, f) ⟨m, n, hm, hn, h1⟩ ⟨p, q, hp, hq, h2⟩
+  simp_all only
+  use m*p, n*q
+  simp_all
+  set B := b * (b ^ 2 - 3 * a ^ 2)
+  set D := d * (d ^ 2 - 3 * c ^ 2)
+  set F := f * (f ^ 2 - 3 * e ^ 2)
+
+  calc m * p * B
+    _ = (m*B) *p := by ring
+    _ = (n*D) *p := by rw[h1]
+    _ = (p*D) *n := by ring
+    _ = (q*F) *n := by rw[h2]
+    _ = n * q * F := by ring
 
 end
